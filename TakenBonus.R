@@ -191,3 +191,20 @@ by_providert %>%
            labels = list(format = "{value}%"))
 
 
+#By descriptor 
+by_descrp = Assessment_taken_bonuses_export_Sample %>% 
+  select(descriptor,total_deposit,name)
+
+by_descriptor = by_descrp %>% 
+  group_by(name, descriptor) %>% 
+  summarize(totald = sum(total_deposit))
+
+by_descriptor %>% 
+  hchart(., type = "column", 
+         hcaes(x = name, 
+               y = totald, 
+               group = descriptor)) %>% 
+  hc_yAxis(opposite = FALSE,
+           labels = list(format = "{value}%"))
+
+
