@@ -113,3 +113,28 @@ BonusTop20 %>%
   geom_bar(stat="identity",position=position_dodge(), alpha = 0.8) + theme_minimal() + 
   scale_fill_gradient(low="#4f908c",high="#6e0ff9") +  theme(legend.position="none")+
   geom_text(aes(label= deposit_amount), hjust= -0.2)
+
+
+#Let's take a look to the top 3 country: Japan, Finland and Germany
+
+JapanBonus = subset(by_bonus, name %in% c("Japan"))
+FinlandBonus = subset(by_bonus, name %in% c("Finland"))
+GermanyBonus = subset(by_bonus, name %in% c("Germany"))
+
+JapanBonus %>% 
+  ggplot(aes(y = bonus_name , x = deposit_amount , fill = deposit_amount )) +
+  geom_bar(stat="identity",position=position_dodge(), alpha = 0.8) + theme_minimal() + 
+  scale_fill_gradient(low="#4f908c",high="#6e0ff9") +  theme(legend.position="none")+
+  geom_text(aes(label= deposit_amount), hjust= -0.2)
+
+FinlandBonus %>% 
+  ggplot(aes(y = bonus_name , x = deposit_amount , fill = deposit_amount )) +
+  geom_bar(stat="identity",position=position_dodge(), alpha = 0.8) + theme_minimal() + 
+  scale_fill_gradient(low="#4f908c",high="#6e0ff9") +  theme(legend.position="none")+
+  geom_text(aes(label= deposit_amount), hjust= -0.2)
+
+GermanyBonus %>% 
+  ggplot(aes(y = bonus_name , x = deposit_amount , fill = deposit_amount )) +
+  geom_bar(stat="identity",position=position_dodge(), alpha = 0.8) + theme_minimal() + 
+  scale_fill_gradient(low="#4f908c",high="#6e0ff9") +  theme(legend.position="none")+
+  geom_text(aes(label= deposit_amount), hjust= -0.2)
