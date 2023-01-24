@@ -174,11 +174,13 @@ bonuses. So their games have better income than any other country.
 
 ```{r}
 #Let's see the best bonus by deposit
-BonusTop20 %>% 
-  ggplot(aes(y = bonus_name , x = total_deposit , fill = total_deposit )) +
-  geom_bar(stat="identity",position=position_dodge(), alpha = 0.8) + theme_minimal() + 
-  scale_fill_gradient(low="#4f908c",high="#6e0ff9") +  theme(legend.position="none")+
-  geom_text(aes(label= total_deposit), hjust= -0.2)
+highchart() %>% 
+  hc_chart(type="column", options3d=list(enabled=TRUE, alpha=15, beta=15)) %>% 
+  hc_xAxis(categories=BonusTop20$bonus_name) %>% 
+  hc_add_series(data=BonusTop20$total_deposit, name="Bonus name") %>% 
+  hc_add_theme(hc_theme_google()) %>% 
+  hc_title(text="Top 20 Bonus name") 
+
 ```
 
 Now let's take a look at each bonus we had for our top 3 countries:
@@ -195,29 +197,87 @@ GermanyBonus = subset(by_bonus, name %in% c("Germany"))
 #### Japan:
 
 ```{r}
-JapanBonus %>% 
-  ggplot(aes(y = bonus_name , x = total_deposit , fill = total_deposit )) +
-  geom_bar(stat="identity",position=position_dodge(), alpha = 0.8) + theme_minimal() + 
-  scale_fill_gradient(low="#4f908c",high="#6e0ff9") +  theme(legend.position="none")+
-  geom_text(aes(label= total_deposit), hjust= -0.2)
+highchart() %>% 
+  hc_chart(type="column", options3d=list(enabled=TRUE, alpha=15, beta=15)) %>% 
+  hc_xAxis(categories=JapanBonus$bonus_name) %>% 
+  hc_add_series(data=JapanBonus$total_deposit, name="Bonus name") %>% 
+  hc_add_theme(hc_theme_google()) %>% 
+  hc_title(text="Japan Bonus name") 
 ```
 
 #### Finland:
 
 ```{r}
-FinlandBonus %>% 
-  ggplot(aes(y = bonus_name , x = total_deposit , fill = total_deposit )) +
-  geom_bar(stat="identity",position=position_dodge(), alpha = 0.8) + theme_minimal() + 
-  scale_fill_gradient(low="#4f908c",high="#6e0ff9") +  theme(legend.position="none")+
-  geom_text(aes(label= total_deposit), hjust= -0.2)
+#Finland
+highchart() %>% 
+  hc_chart(type="column", options3d=list(enabled=TRUE, alpha=15, beta=15)) %>% 
+  hc_xAxis(categories=FinlandBonus$bonus_name) %>% 
+  hc_add_series(data=FinlandBonus$total_deposit, name="Bonus name") %>% 
+  hc_add_theme(hc_theme_google()) %>% 
+  hc_title(text="Finland Bonus name") 
 ```
 
 #### Germany:
 
 ```{r}
-GermanyBonus %>% 
-  ggplot(aes(y = bonus_name , x = total_deposit , fill = total_deposit)) +
-  geom_bar(stat="identity",position=position_dodge(), alpha = 0.8) + theme_minimal() + 
-  scale_fill_gradient(low="#4f908c",high="#6e0ff9") +  theme(legend.position="none")+
-  geom_text(aes(label= total_deposit), hjust= -0.2)
+#Germany
+highchart() %>% 
+  hc_chart(type="column", options3d=list(enabled=TRUE, alpha=15, beta=15)) %>% 
+  hc_xAxis(categories=GermanyBonus$bonus_name) %>% 
+  hc_add_series(data=GermanyBonus$total_deposit, name="Bonus name") %>% 
+  hc_add_theme(hc_theme_google()) %>% 
+  hc_title(text="Germany Bonus name") 
+```
+
+## By Bonus Type;
+
+```{r}
+#Let's analyze the bonus type
+by_bonustype = Assessment_taken_bonuses_export_Sample %>% 
+  select(bonus_type, total_deposit,name) 
+
+
+by_bonustypet = by_bonustype %>% 
+  group_by(name, bonus_type) %>% 
+  summarize(totald = sum(total_deposit))
+```
+
+With this it is understood that the type of bonus that was for "DATE" is
+much higher than the "WELCOME CRM"
+
+```{r}
+#Let's graphic by type of bonus and each country
+
+by_bonustypet %>% 
+  hchart(., type = "column", 
+         hcaes(x = name, 
+               y = totald, 
+               group = bonus_type)) %>% 
+  hc_yAxis(opposite = FALSE,
+           labels = list(format = "{value}%"))
+```
+
+## About the provider;
+
+Playngo, pragmatic and thunderkick are the top 3 best providers
+according to the performance of the bonus slots and the depostis the
+users made by game.
+
+```{r}
+#Now let's take a look to the provider
+by_provider = Assessment_taken_bonuses_export_Sample %>% 
+  select(provider_name,total_deposit,name)
+
+
+by_providert = by_provider %>% 
+  group_by(name, provider_name) %>% 
+  summarize(totald = sum(total_deposit))
+
+by_providert %>% 
+  hchart(., type = "column", 
+         hcaes(x = name, 
+               y = totald, 
+               group = provider_name)) %>% 
+  hc_yAxis(opposite = FALSE,
+           labels = list(format = "{value}%"))
 ```
