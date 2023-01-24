@@ -178,3 +178,20 @@ by_bonustypet %>%
   hc_yAxis(opposite = FALSE,
            labels = list(format = "{value}%"))
 
+
+#Now let's take a look to the provider
+by_provider = Assessment_taken_bonuses_export_Sample %>% 
+  select(provider_name,total_deposit,name)
+
+
+by_providert = by_provider %>% 
+  group_by(name, provider_name) %>% 
+  summarize(totald = sum(total_deposit))
+
+by_providert %>% 
+  hchart(., type = "column", 
+         hcaes(x = name, 
+               y = totald, 
+               group = provider_name)) %>% 
+  hc_yAxis(opposite = FALSE,
+           labels = list(format = "{value}%"))
