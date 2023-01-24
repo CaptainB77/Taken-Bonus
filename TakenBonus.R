@@ -22,8 +22,15 @@ library('stringr') # string manipulation
 library('forcats') # factor manipulation
 library('janitor') # data cleaning
 library('scales')
+library(DT)
 
 tibble(Assessment_taken_bonuses_export_Sample)
+
+#Let's clean our data first
+
+Assessment_taken_bonuses_export_Sample %>%
+  clean_names()
+
 
 # renaming location to name for mapping
 colnames(Assessment_taken_bonuses_export_Sample)[2]<-"name"
@@ -76,4 +83,33 @@ highchart() %>%
   hc_xAxis(categories=total_cases_world $name) %>% 
   hc_add_series(data=total_cases_world$sum_total, name="Country") %>% 
   hc_add_theme(hc_theme_google()) %>% 
-  hc_title(text="Total deposit by country")
+  hc_title(text="Total deposit by country") 
+
+#Now let's analyze the bonus data
+bonus_data = Assessment_taken_bonuses_export_Sample %>% 
+  select(name, bonus_type, bonus_name, provider_name, freespins_campaign_id, slot_name, deposit_amount)
+
+by_bonus = bonus_data %>% 
+  select(bonus_name, deposit_amount,name) %>% 
+  group_by(bonus_name)
+
+data %>% 
+  select(bonus_name,deposit_amount,name,bonus_type) %>% 
+  datatable(., options = list(pageLength = 10))
+
+BonusTop20 <- data %>% 
+  arrange(desc(deposit_amount)) %>% 
+  head(n = 20) %>%
+  as.data.frame()
+
+BonusTop20 %>% 
+  select(bonus_name,deposit_amount,name,bonus_type) %>% 
+  datatable(., options = list(pageLength = 10))
+
+
+#Let's see the best bonus by deposit
+BonusTop20 %>% 
+  ggplot(aes(y = bonus_name , x = deposit_amount , fill = deposit_amount )) +
+  geom_bar(stat="identity",position=position_dodge(), alpha = 0.8) + theme_minimal() + 
+  scale_fill_gradient(low="#4f908c",high="#6e0ff9") +  theme(legend.position="none")+
+  geom_text(aes(label= deposit_amount), hjust= -0.2)
