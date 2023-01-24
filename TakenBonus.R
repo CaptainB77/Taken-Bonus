@@ -158,23 +158,11 @@ by_bonustypet = by_bonustype %>%
 
 #Let's graphic by type of bonus and each country
 
-#Date bonus type
 by_bonustypet %>% 
-  filter(bonus_type == "DATE") %>%
   hchart(., type = "column", 
-         hcaes(x = bonus_type, 
+         hcaes(x = name, 
                y = totald, 
-               group = name)) %>% 
-  hc_yAxis(opposite = FALSE,
-           labels = list(format = "{value}%"))
-
-#CRM WELCOME BONUS bonus type
-by_bonustypet %>% 
-  filter(bonus_type == "CRM WELCOME BONUS") %>%
-  hchart(., type = "column", 
-         hcaes(x = bonus_type, 
-               y = totald, 
-               group = name)) %>% 
+               group = bonus_type)) %>% 
   hc_yAxis(opposite = FALSE,
            labels = list(format = "{value}%"))
 
@@ -195,3 +183,5 @@ by_providert %>%
                group = provider_name)) %>% 
   hc_yAxis(opposite = FALSE,
            labels = list(format = "{value}%"))
+
+
