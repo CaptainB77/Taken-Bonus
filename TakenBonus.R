@@ -128,23 +128,29 @@ JapanBonus = subset(by_bonus, name %in% c("Japan"))
 FinlandBonus = subset(by_bonus, name %in% c("Finland"))
 GermanyBonus = subset(by_bonus, name %in% c("Germany"))
 
-JapanBonus %>% 
-  ggplot(aes(y = bonus_name , x = total_deposit , fill = total_deposit )) +
-  geom_bar(stat="identity",position=position_dodge(), alpha = 0.8) + theme_minimal() + 
-  scale_fill_gradient(low="#4f908c",high="#6e0ff9") +  theme(legend.position="none")+
-  geom_text(aes(label= total_deposit), hjust= -0.2)
+#Japan
+highchart() %>% 
+  hc_chart(type="column", options3d=list(enabled=TRUE, alpha=15, beta=15)) %>% 
+  hc_xAxis(categories=JapanBonus$bonus_name) %>% 
+  hc_add_series(data=JapanBonus$total_deposit, name="Bonus name") %>% 
+  hc_add_theme(hc_theme_google()) %>% 
+  hc_title(text="Japan Bonus name") 
 
-FinlandBonus %>% 
-  ggplot(aes(y = bonus_name , x = total_deposit , fill = total_deposit )) +
-  geom_bar(stat="identity",position=position_dodge(), alpha = 0.8) + theme_minimal() + 
-  scale_fill_gradient(low="#4f908c",high="#6e0ff9") +  theme(legend.position="none")+
-  geom_text(aes(label= total_deposit), hjust= -0.2)
+#Finland
+highchart() %>% 
+  hc_chart(type="column", options3d=list(enabled=TRUE, alpha=15, beta=15)) %>% 
+  hc_xAxis(categories=FinlandBonus$bonus_name) %>% 
+  hc_add_series(data=FinlandBonus$total_deposit, name="Bonus name") %>% 
+  hc_add_theme(hc_theme_google()) %>% 
+  hc_title(text="Finland Bonus name") 
 
-GermanyBonus %>% 
-  ggplot(aes(y = bonus_name , x = total_deposit , fill = total_deposit)) +
-  geom_bar(stat="identity",position=position_dodge(), alpha = 0.8) + theme_minimal() + 
-  scale_fill_gradient(low="#4f908c",high="#6e0ff9") +  theme(legend.position="none")+
-  geom_text(aes(label= total_deposit), hjust= -0.2)
+#Germany
+highchart() %>% 
+  hc_chart(type="column", options3d=list(enabled=TRUE, alpha=15, beta=15)) %>% 
+  hc_xAxis(categories=GermanyBonus$bonus_name) %>% 
+  hc_add_series(data=GermanyBonus$total_deposit, name="Bonus name") %>% 
+  hc_add_theme(hc_theme_google()) %>% 
+  hc_title(text="Germany Bonus name") 
 
 
 #Let's analyze the bonus type
