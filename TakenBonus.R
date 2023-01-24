@@ -148,5 +148,33 @@ GermanyBonus %>%
 
 
 #Let's analyze the bonus type
-by_provider = Assessment_taken_bonuses_export_Sample %>% 
+by_bonustype = Assessment_taken_bonuses_export_Sample %>% 
   select(bonus_type, total_deposit,name) 
+
+
+by_bonustypet = by_bonustype %>% 
+  group_by(name, bonus_type) %>% 
+  summarize(totald = sum(total_deposit))
+
+#Let's graphic by type of bonus and each country
+
+#Date bonus type
+by_bonustypet %>% 
+  filter(bonus_type == "DATE") %>%
+  hchart(., type = "column", 
+         hcaes(x = bonus_type, 
+               y = totald, 
+               group = name)) %>% 
+  hc_yAxis(opposite = FALSE,
+           labels = list(format = "{value}%"))
+
+#CRM WELCOME BONUS bonus type
+by_bonustypet %>% 
+  filter(bonus_type == "CRM WELCOME BONUS") %>%
+  hchart(., type = "column", 
+         hcaes(x = bonus_type, 
+               y = totald, 
+               group = name)) %>% 
+  hc_yAxis(opposite = FALSE,
+           labels = list(format = "{value}%"))
+
