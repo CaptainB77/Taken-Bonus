@@ -52,12 +52,16 @@ Assessment_taken_bonuses_export_Sample$name[Assessment_taken_bonuses_export_Samp
 Assessment_taken_bonuses_export_Sample$name[Assessment_taken_bonuses_export_Sample$name=="UA"]<- "Ukraine"
 
 
+#Create the total amount of deposit
+Assessment_taken_bonuses_export_Sample$total_deposit <- Assessment_taken_bonuses_export_Sample$number_of_deposits * Assessment_taken_bonuses_export_Sample$deposit_amount
+
+
 total_cases<-Assessment_taken_bonuses_export_Sample %>%
-  select(name, deposit_amount) 
+  select(name, total_deposit) 
 
 total_cases_world <- total_cases %>% 
   group_by(name) %>% 
-  summarize(sum_total = sum(deposit_amount)) %>% 
+  summarize(sum_total = sum(total_deposit)) %>% 
   arrange(desc(sum_total)) 
 
 #Mapping of total deposit
@@ -87,32 +91,35 @@ highchart() %>%
 
 #Now let's analyze the bonus data
 bonus_data = Assessment_taken_bonuses_export_Sample %>% 
-  select(name, bonus_type, bonus_name, provider_name, freespins_campaign_id, slot_name, deposit_amount)
+  select(name, bonus_type, bonus_name, provider_name, freespins_campaign_id, slot_name, total_deposit)
 
 by_bonus = bonus_data %>% 
-  select(bonus_name, deposit_amount,name) %>% 
+  select(bonus_name, total_deposit,name) %>% 
   group_by(bonus_name)
 
+data = Assessment_taken_bonuses_export_Sample %>% 
+  select(name, bonus_type, bonus_name, provider_name, freespins_campaign_id, slot_name, total_deposit)
+
 data %>% 
-  select(bonus_name,deposit_amount,name,bonus_type) %>% 
+  select(bonus_name,total_deposit,name,bonus_type) %>% 
   datatable(., options = list(pageLength = 10))
 
 BonusTop20 <- data %>% 
-  arrange(desc(deposit_amount)) %>% 
+  arrange(desc(total_deposit)) %>% 
   head(n = 20) %>%
   as.data.frame()
 
 BonusTop20 %>% 
-  select(bonus_name,deposit_amount,name,bonus_type) %>% 
+  select(bonus_name,total_deposit,name,bonus_type) %>% 
   datatable(., options = list(pageLength = 10))
 
 
 #Let's see the best bonus by deposit
 BonusTop20 %>% 
-  ggplot(aes(y = bonus_name , x = deposit_amount , fill = deposit_amount )) +
+  ggplot(aes(y = bonus_name , x = total_deposit , fill = total_deposit )) +
   geom_bar(stat="identity",position=position_dodge(), alpha = 0.8) + theme_minimal() + 
   scale_fill_gradient(low="#4f908c",high="#6e0ff9") +  theme(legend.position="none")+
-  geom_text(aes(label= deposit_amount), hjust= -0.2)
+  geom_text(aes(label= total_deposit), hjust= -0.2)
 
 
 #Let's take a look to the top 3 country: Japan, Finland and Germany
@@ -122,19 +129,24 @@ FinlandBonus = subset(by_bonus, name %in% c("Finland"))
 GermanyBonus = subset(by_bonus, name %in% c("Germany"))
 
 JapanBonus %>% 
-  ggplot(aes(y = bonus_name , x = deposit_amount , fill = deposit_amount )) +
+  ggplot(aes(y = bonus_name , x = total_deposit , fill = total_deposit )) +
   geom_bar(stat="identity",position=position_dodge(), alpha = 0.8) + theme_minimal() + 
   scale_fill_gradient(low="#4f908c",high="#6e0ff9") +  theme(legend.position="none")+
-  geom_text(aes(label= deposit_amount), hjust= -0.2)
+  geom_text(aes(label= total_deposit), hjust= -0.2)
 
 FinlandBonus %>% 
-  ggplot(aes(y = bonus_name , x = deposit_amount , fill = deposit_amount )) +
+  ggplot(aes(y = bonus_name , x = total_deposit , fill = total_deposit )) +
   geom_bar(stat="identity",position=position_dodge(), alpha = 0.8) + theme_minimal() + 
   scale_fill_gradient(low="#4f908c",high="#6e0ff9") +  theme(legend.position="none")+
-  geom_text(aes(label= deposit_amount), hjust= -0.2)
+  geom_text(aes(label= total_deposit), hjust= -0.2)
 
 GermanyBonus %>% 
-  ggplot(aes(y = bonus_name , x = deposit_amount , fill = deposit_amount )) +
+  ggplot(aes(y = bonus_name , x = total_deposit , fill = total_deposit)) +
   geom_bar(stat="identity",position=position_dodge(), alpha = 0.8) + theme_minimal() + 
   scale_fill_gradient(low="#4f908c",high="#6e0ff9") +  theme(legend.position="none")+
-  geom_text(aes(label= deposit_amount), hjust= -0.2)
+  geom_text(aes(label= total_deposit), hjust= -0.2)
+
+
+#Let's analyze the bonus type
+by_provider = Assessment_taken_bonuses_export_Sample %>% 
+  select(bonus_type, total_deposit,name) 
