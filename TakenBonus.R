@@ -50,7 +50,10 @@ total_cases<-Assessment_taken_bonuses_export_Sample %>%
 
 total_cases_world <- total_cases %>% 
   group_by(name) %>% 
-  summarize(sum_total = sum(deposit_amount))
+  summarize(sum_total = sum(deposit_amount)) %>% 
+  arrange(desc(sum_total)) 
+
+#Mapping of total deposit
 
 highchart() %>%
   hc_add_series_map(worldgeojson, df = total_cases_world, value = "sum_total", joinBy = "name") %>% 
@@ -62,3 +65,15 @@ highchart() %>%
   hc_subtitle(text="Total Deposit Amount: 27,828", style=list(fontsize = "15px")) %>% 
   hc_add_theme(hc_theme_economist())
 
+#Graphic of the cases by country
+
+total_cases_world %>% 
+  arrange(desc(sum_total)) %>% 
+  slice(1:15)
+
+highchart() %>% 
+  hc_chart(type="column", options3d=list(enabled=TRUE, alpha=15, beta=15)) %>% 
+  hc_xAxis(categories=total_cases_world $name) %>% 
+  hc_add_series(data=total_cases_world$sum_total, name="Country") %>% 
+  hc_add_theme(hc_theme_google()) %>% 
+  hc_title(text="Total deposit by country")
