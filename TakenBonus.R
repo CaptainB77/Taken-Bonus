@@ -115,12 +115,12 @@ BonusTop20 %>%
 
 
 #Let's see the best bonus by deposit
-BonusTop20 %>% 
-  ggplot(aes(y = bonus_name , x = total_deposit , fill = total_deposit )) +
-  geom_bar(stat="identity",position=position_dodge(), alpha = 0.8) + theme_minimal() + 
-  scale_fill_gradient(low="#4f908c",high="#6e0ff9") +  theme(legend.position="none")+
-  geom_text(aes(label= total_deposit), hjust= -0.2)
-
+highchart() %>% 
+  hc_chart(type="column", options3d=list(enabled=TRUE, alpha=15, beta=15)) %>% 
+  hc_xAxis(categories=BonusTop20$bonus_name) %>% 
+  hc_add_series(data=BonusTop20$total_deposit, name="Bonus name") %>% 
+  hc_add_theme(hc_theme_google()) %>% 
+  hc_title(text="Top 20 Bonus name") 
 
 #Let's take a look to the top 3 country: Japan, Finland and Germany
 
