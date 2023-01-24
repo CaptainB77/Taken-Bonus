@@ -208,3 +208,31 @@ by_descriptor %>%
            labels = list(format = "{value}%"))
 
 
+#Campaings by country
+by_camp = Assessment_taken_bonuses_export_Sample %>% 
+  select(`campaigns ID`,total_deposit,name)
+
+campaing = by_camp %>% 
+  group_by(name, `campaigns ID`) %>% 
+  summarize(totald = sum(total_deposit))
+
+
+campg = campaing %>% 
+ count(name)
+
+campg2 = campaing %>% 
+  select(name, totald) %>% 
+  summarize(totald2 = sum(totald))
+
+colnames(campg)[2] = "number_campaings"
+
+campaingt = merge(x = campg, y = campg2, by = c("name"))
+
+campaingt %>% 
+  arrange(desc(number_campaings)) %>% 
+  hchart(., type = "column", 
+         hcaes(x = name, 
+               y = number_campaings, 
+               group = totald2)) %>% 
+  hc_yAxis(opposite = FALSE,
+           labels = list(format = "{value}%"))
