@@ -229,7 +229,7 @@ highchart() %>%
   hc_title(text="Germany Bonus name") 
 ```
 
-## By Bonus Type;
+# By Bonus Type;
 
 ```{r}
 #Let's analyze the bonus type
@@ -257,7 +257,7 @@ by_bonustypet %>%
            labels = list(format = "{value}%"))
 ```
 
-## About the provider;
+# By Provider;
 
 Playngo, pragmatic and thunderkick are the top 3 best providers
 according to the performance of the bonus slots and the depostis the
@@ -278,6 +278,70 @@ by_providert %>%
          hcaes(x = name, 
                y = totald, 
                group = provider_name)) %>% 
+  hc_yAxis(opposite = FALSE,
+           labels = list(format = "{value}%"))
+```
+
+# By Descriptor;
+
+According to the data "JP churn" , "FI active" and "DE active" are the
+descriptors more populars.
+
+```{r}
+#By descriptor 
+by_descrp = Assessment_taken_bonuses_export_Sample %>% 
+  select(descriptor,total_deposit,name)
+
+by_descriptor = by_descrp %>% 
+  group_by(name, descriptor) %>% 
+  summarize(totald = sum(total_deposit))
+
+by_descriptor %>% 
+  hchart(., type = "column", 
+         hcaes(x = name, 
+               y = totald, 
+               group = descriptor)) %>% 
+  hc_yAxis(opposite = FALSE,
+           labels = list(format = "{value}%"))
+
+```
+
+# By Campaing; 
+
+I got the list of how many campaigns were running in these 2 months of
+analysis to understand if there was any relationship.
+
+Germany and Finland remain at the top, also in terms of campaigns;
+however, Japan does not, despite being the country with the best
+results.
+
+```{r}
+#Campaings by country
+by_camp = Assessment_taken_bonuses_export_Sample %>% 
+  select(`campaigns ID`,total_deposit,name)
+
+campaing = by_camp %>% 
+  group_by(name, `campaigns ID`) %>% 
+  summarize(totald = sum(total_deposit))
+
+
+campg = campaing %>% 
+ count(name)
+
+campg2 = campaing %>% 
+  select(name, totald) %>% 
+  summarize(totald2 = sum(totald))
+
+colnames(campg)[2] = "number_campaings"
+
+campaingt = merge(x = campg, y = campg2, by = c("name"))
+
+campaingt %>% 
+  arrange(desc(number_campaings)) %>% 
+  hchart(., type = "column", 
+         hcaes(x = name, 
+               y = number_campaings, 
+               group = totald2)) %>% 
   hc_yAxis(opposite = FALSE,
            labels = list(format = "{value}%"))
 ```
