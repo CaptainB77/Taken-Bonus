@@ -1,0 +1,223 @@
+---
+title: "TBonus"
+author: "Benjamin Esquinca"
+date: "2023-01-24"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# About the data:
+
+For this analysis I am going to take a database that was given to me, in
+which I will explore to determine what this database is, what it talks
+about and what I can do with it.
+
+The database is centered on the 2022 date from April 11 to June 14.
+Being around 2 months of data.
+
+#### Loading libraries:
+
+```{r}
+library('tidyverse') # essential R packages for data science
+library('data.table')
+
+library('ggplot2') # visualization
+library("ggtext")
+library("highcharter")
+library('gganimate')
+
+library('dplyr') # data manipulation
+library('readr') # input/output
+library('skimr') # overview
+library('tibble') # data wrangling
+library('tidyr') # data wrangling
+library('purrr') # data wrangling
+library('stringr') # string manipulation
+library('forcats') # factor manipulation
+library('janitor') # data cleaning
+library('scales')
+library(DT)
+```
+
+#### Load the data: 
+
+```{r}
+library(readr)
+Assessment_taken_bonuses_export_Sample <- read_csv("Assessment - taken-bonuses-export - Sample.csv")
+View(Assessment_taken_bonuses_export_Sample)
+```
+
+#### Clean data: 
+
+```{r}
+tibble(Assessment_taken_bonuses_export_Sample)
+
+#Let's clean our data first
+
+Assessment_taken_bonuses_export_Sample %>%
+  clean_names()
+
+
+# renaming location to name for mapping
+colnames(Assessment_taken_bonuses_export_Sample)[2]<-"name"
+
+Assessment_taken_bonuses_export_Sample$name[Assessment_taken_bonuses_export_Sample$name=="FI"]<- "Finland"
+Assessment_taken_bonuses_export_Sample$name[Assessment_taken_bonuses_export_Sample$name=="JP"]<- "Japan"
+Assessment_taken_bonuses_export_Sample$name[Assessment_taken_bonuses_export_Sample$name=="NZ"]<- "New Zealand"
+Assessment_taken_bonuses_export_Sample$name[Assessment_taken_bonuses_export_Sample$name=="AT"]<- "Austria"
+Assessment_taken_bonuses_export_Sample$name[Assessment_taken_bonuses_export_Sample$name=="BE"]<- "Belgium"
+Assessment_taken_bonuses_export_Sample$name[Assessment_taken_bonuses_export_Sample$name=="CA"]<- "Canada"
+Assessment_taken_bonuses_export_Sample$name[Assessment_taken_bonuses_export_Sample$name=="CH"]<- "Switzerland"
+Assessment_taken_bonuses_export_Sample$name[Assessment_taken_bonuses_export_Sample$name=="CK"]<- "Cook Islands"
+Assessment_taken_bonuses_export_Sample$name[Assessment_taken_bonuses_export_Sample$name=="CY"]<- "Cyprus"
+Assessment_taken_bonuses_export_Sample$name[Assessment_taken_bonuses_export_Sample$name=="CZ"]<- "Czech Republic"
+Assessment_taken_bonuses_export_Sample$name[Assessment_taken_bonuses_export_Sample$name=="DE"]<- "Germany"
+Assessment_taken_bonuses_export_Sample$name[Assessment_taken_bonuses_export_Sample$name=="IE"]<- "Republic of Ireland"
+Assessment_taken_bonuses_export_Sample$name[Assessment_taken_bonuses_export_Sample$name=="LU"]<- "Luxembourg"
+Assessment_taken_bonuses_export_Sample$name[Assessment_taken_bonuses_export_Sample$name=="NO"]<- "Norway"
+Assessment_taken_bonuses_export_Sample$name[Assessment_taken_bonuses_export_Sample$name=="UA"]<- "Ukraine"
+
+
+```
+
+With the exploration of data for this analysis, the behavior of the
+bonus slots will be determined, by country, provider, and name.
+
+Let's start by exploring the data by country.
+
+# By Country; 
+
+```{r}
+#Create the total amount of deposit
+Assessment_taken_bonuses_export_Sample$total_deposit <- Assessment_taken_bonuses_export_Sample$number_of_deposits * Assessment_taken_bonuses_export_Sample$deposit_amount
+
+
+total_cases<-Assessment_taken_bonuses_export_Sample %>%
+  select(name, total_deposit) 
+
+total_cases_world <- total_cases %>% 
+  group_by(name) %>% 
+  summarize(sum_total = sum(total_deposit)) %>% 
+  arrange(desc(sum_total)) 
+```
+
+Here we can observe the countries that we will be exploring. The first
+thing we can see is that Japan is the country with the largest deposit.
+
+```{r}
+#Mapping of total deposit
+
+highchart() %>%
+  hc_add_series_map(worldgeojson, df = total_cases_world, value = "sum_total", joinBy = "name") %>% 
+  hc_legend(enabled = TRUE) %>% 
+  hc_add_theme(hc_theme_bloom()) %>% 
+  hc_colorAxis(minColor = "lightblue", maxColor="mediumblue") %>% 
+  hc_mapNavigation(enabled = TRUE) %>%
+  hc_title(text = "World Total Deposit", style = list(fontSize = "25px")) %>%
+  hc_subtitle(text="Total Deposit Amount: 27,828", style=list(fontsize = "15px")) %>% 
+  hc_add_theme(hc_theme_economist())
+```
+
+We have a big difference in the top 3 countries which are: Japan,
+Finland and Germany. Taking a considerable advantage against the rest.
+
+```{r}
+#Graphic of the cases by country
+
+total_cases_world %>% 
+  arrange(desc(sum_total)) %>% 
+  slice(1:15)
+
+highchart() %>% 
+  hc_chart(type="column", options3d=list(enabled=TRUE, alpha=15, beta=15)) %>% 
+  hc_xAxis(categories=total_cases_world $name) %>% 
+  hc_add_series(data=total_cases_world$sum_total, name="Country") %>% 
+  hc_add_theme(hc_theme_google()) %>% 
+  hc_title(text="Total deposit by country") 
+```
+
+# Bonus Data;
+
+Here we can see the best bonuses according to your deposited total, the
+type of bonus, and the country.
+
+```{r}
+#Now let's analyze the bonus data
+bonus_data = Assessment_taken_bonuses_export_Sample %>% 
+  select(name, bonus_type, bonus_name, provider_name, freespins_campaign_id, slot_name, total_deposit)
+
+by_bonus = bonus_data %>% 
+  select(bonus_name, total_deposit,name) %>% 
+  group_by(bonus_name)
+
+data = Assessment_taken_bonuses_export_Sample %>% 
+  select(name, bonus_type, bonus_name, provider_name, freespins_campaign_id, slot_name, total_deposit)
+
+data %>% 
+  select(bonus_name,total_deposit,name,bonus_type) %>% 
+  datatable(., options = list(pageLength = 10))
+
+BonusTop20 <- data %>% 
+  arrange(desc(total_deposit)) %>% 
+  head(n = 20) %>%
+  as.data.frame()
+
+BonusTop20 %>% 
+  select(bonus_name,total_deposit,name,bonus_type) %>% 
+  datatable(., options = list(pageLength = 10))
+```
+
+According to the total tables, Japan is the country with the best
+bonuses. So their games have better income than any other country.
+
+```{r}
+#Let's see the best bonus by deposit
+BonusTop20 %>% 
+  ggplot(aes(y = bonus_name , x = total_deposit , fill = total_deposit )) +
+  geom_bar(stat="identity",position=position_dodge(), alpha = 0.8) + theme_minimal() + 
+  scale_fill_gradient(low="#4f908c",high="#6e0ff9") +  theme(legend.position="none")+
+  geom_text(aes(label= total_deposit), hjust= -0.2)
+```
+
+Now let's take a look at each bonus we had for our top 3 countries:
+Japan, Finland and Germany.
+
+```{r}
+#Let's take a look to the top 3 country: Japan, Finland and Germany
+
+JapanBonus = subset(by_bonus, name %in% c("Japan"))
+FinlandBonus = subset(by_bonus, name %in% c("Finland"))
+GermanyBonus = subset(by_bonus, name %in% c("Germany"))
+```
+
+#### Japan:
+
+```{r}
+JapanBonus %>% 
+  ggplot(aes(y = bonus_name , x = total_deposit , fill = total_deposit )) +
+  geom_bar(stat="identity",position=position_dodge(), alpha = 0.8) + theme_minimal() + 
+  scale_fill_gradient(low="#4f908c",high="#6e0ff9") +  theme(legend.position="none")+
+  geom_text(aes(label= total_deposit), hjust= -0.2)
+```
+
+#### Finland:
+
+```{r}
+FinlandBonus %>% 
+  ggplot(aes(y = bonus_name , x = total_deposit , fill = total_deposit )) +
+  geom_bar(stat="identity",position=position_dodge(), alpha = 0.8) + theme_minimal() + 
+  scale_fill_gradient(low="#4f908c",high="#6e0ff9") +  theme(legend.position="none")+
+  geom_text(aes(label= total_deposit), hjust= -0.2)
+```
+
+#### Germany:
+
+```{r}
+GermanyBonus %>% 
+  ggplot(aes(y = bonus_name , x = total_deposit , fill = total_deposit)) +
+  geom_bar(stat="identity",position=position_dodge(), alpha = 0.8) + theme_minimal() + 
+  scale_fill_gradient(low="#4f908c",high="#6e0ff9") +  theme(legend.position="none")+
+  geom_text(aes(label= total_deposit), hjust= -0.2)
+```
